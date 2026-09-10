@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#65151d">
+<title>Pengaturan Mesin — HSM AI</title>
+<link rel="icon" href="assets/favicon.ico">
+<script src="config.js"></script>
+<script src="api-client.js"></script>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#181818;background:#f6f6f4}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#fff,#f7eeee)}
+main{max-width:780px;margin:0 auto;padding:56px 22px}.card{background:#fff;border:1px solid #e4e1df;border-radius:20px;padding:28px;box-shadow:0 18px 50px rgba(0,0,0,.08)}
+h1{margin:0 0 8px;font-size:30px}.sub{color:#6f6f6f;line-height:1.6;margin-bottom:24px}.label{display:block;font-weight:700;margin:18px 0 8px}
+input{width:100%;padding:14px 15px;border:1px solid #d9d6d4;border-radius:12px;font:inherit;outline:none}input:focus{border-color:#111;box-shadow:0 0 0 3px rgba(0,0,0,.06)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}button,a.btn{border:0;border-radius:11px;padding:12px 16px;font-weight:700;cursor:pointer;text-decoration:none;background:#111;color:#fff}button.secondary,a.secondary{background:#efefed;color:#222}
+.status{margin-top:18px;padding:13px 14px;border-radius:11px;background:#f4f4f2;color:#555;white-space:pre-wrap}.ok{background:#ecf8ef;color:#176b2e}.bad{background:#fff0f0;color:#9d1c1c}
+.note{margin-top:24px;padding:16px;border-left:4px solid #d91f2f;background:#fff6f6;line-height:1.55;color:#555}.note code{background:#eee;padding:2px 5px;border-radius:5px}
+</style>
+</head>
+<body><main><div class="card">
+<h1>Pengaturan Mesin</h1>
+<p class="sub">Versi GitHub tidak lagi memakai InfinityFree/PHP. Masukkan URL Cloudflare Worker yang sudah Anda deploy. API key disimpan sebagai secret di Worker, bukan di halaman GitHub.</p>
+<label class="label" for="workerUrl">URL Cloudflare Worker</label>
+<input id="workerUrl" placeholder="https://hsm-ai-api.nama-anda.workers.dev" autocomplete="off">
+<div class="actions">
+<button id="saveBtn">Simpan & Tes</button>
+<button id="clearBtn" class="secondary">Hapus URL</button>
+<a class="btn secondary" href="index.html">Kembali ke HSM AI</a>
+</div>
+<div id="status" class="status">Belum dites.</div>
+<div class="note"><strong>Keamanan:</strong> jangan menaruh Gemini API key atau Cloudflare API token di <code>config.js</code>, HTML, atau repository GitHub. Masukkan key/token melalui <code>wrangler secret put</code> seperti petunjuk di README.</div>
+</div></main>
+<script>
+const input=document.getElementById('workerUrl'), status=document.getElementById('status');
+input.value=window.hsmGetApiBase()||'';
+async function test(){
+  status.className='status'; status.textContent='Menguji Worker...';
+  try{
+    const url=window.hsmApiUrl('/health');
+    const r=await fetch(url,{headers:{Accept:'application/json'}}); const d=await r.json();
+    if(!r.ok||!d.success) throw new Error(d.message||`HTTP ${r.status}`);
+    status.className='status ok'; status.textContent=`Terhubung. ${d.message||'Worker aktif.'}`;
+  }catch(e){status.className='status bad';status.textContent='Gagal: '+(e.message||e)}
+}
+document.getElementById('saveBtn').onclick=async()=>{try{window.hsmSetApiBase(input.value); await test()}catch(e){status.className='status bad';status.textContent='Gagal: '+e.message}};
+document.getElementById('clearBtn').onclick=()=>{localStorage.removeItem('hsm_ai_worker_url');input.value='';status.className='status';status.textContent='URL Worker dihapus.'};
+</script></body></html>

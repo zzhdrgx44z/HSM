@@ -1,0 +1,9 @@
+HSM AI sudah diubah untuk GitHub Pages.
+
+1) Upload folder ini ke GitHub.
+2) Aktifkan Pages via GitHub Actions.
+3) Deploy folder worker ke Cloudflare Worker.
+4) Masukkan URL Worker di menu Pengaturan Mesin.
+
+Tidak perlu InfinityFree, PHP, MySQL, atau .htaccess.
+Jangan upload config.local.php lama karena berisi secret.

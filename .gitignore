@@ -1,0 +1,8 @@
+# Secrets / local files
+.env
+.dev.vars
+.dev.vars.*
+worker/.wrangler/
+worker/node_modules/
+config.local.php
+*.log
